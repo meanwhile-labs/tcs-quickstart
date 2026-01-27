@@ -12,12 +12,11 @@ Please let me know if you find other games that work!
 
 ## Installation
 
-1. Download the `dinput8.dll` from the [mod_loader](https://github.com/lcdr/mod_loader/releases) project. (don't worry that it says LEGO Universe, it works for TT games too)
-2. Put the mod_loader's `dinput8.dll` into the same folder as your game EXE.
-3. In the same folder as your game EXE, create a `mods/jitpatcher` folder.
-4. Download the latest [`mod.dll`](https://github.com/meanwhile-labs/ttlego-jitpatcher/releases) file from this project and place it in `mods/jitpatcher`.
-5. Again in your game EXE folder, create a `patches` folder.
-6. Add `.toml` files to the `patches` folder. You can find examples in the [examples](./examples/) folder in this project.
+1. Add [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) to the game folder (`dinput8.dll` will work fine).
+2. In the game folder, create a `plugins/jitpatcher` folder.
+4. Download the latest [`jitpatcher.asi`](https://github.com/meanwhile-labs/ttlego-jitpatcher/releases) file from this project and place it in `plugins/jitpatcher`.
+5. Next to the ASI file, create a `patches` folder.
+6. Add `.toml` files to the `patches` folder. You can find examples in the [examples](./examples/) folder in this project. Any of those patches will be automatically applied when the game starts.
 
 ## Creating patches
 
@@ -65,21 +64,16 @@ Remember that game code is stored in little-endian format. If you don't know wha
 
 ## How it works
 
-TODO
+See the `src/apply_patch.rs` file for the meaty stuff. The rest is mostly housekeeping, plus some code to display log messages if needed.
 
 ## Development
 
-DLL must be built with `cargo build --target i686-pc-windows-msvc` to actually work with the game!
+DLL must be built with `cargo build --target i686-pc-windows-msvc` to actually work with the game! Then rename it to `jitpatcher.asi` to work with Ultimate ASI Loader.
 
 ## Roadmap/ideas
 
 - More documentation, especially of the internals
 - More testing on various games
 - More example patch files for more games
-- Maybe build our own dll injection instead of relying on `mod_loader`, since
-  1. it makes the installation instructions confusing when we're suddenly talking about LEGO Universe
-  2. it hasn't been maintained for 4 years
-  3. it calls `LoadLibrary` inside `DllMain` which is apparently a Win32 no-no and might cause problems (freezing up on startup, probably) down the road
 - Auto-detect different versions of the same game (ex. Steam vs. GOG) and adjust patches to fit
 - Support for code caves, to support more ambitious modifications
-- Compatibility/interoperability with [Reloaded 2](https://github.com/Reloaded-Project/Reloaded-II), since the TT LEGO modding community is starting to lean on that tool for complex mods.
