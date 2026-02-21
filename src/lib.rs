@@ -8,7 +8,6 @@ mod apply_patch;
 mod init;
 mod messaging;
 mod patches;
-mod patches_old;
 
 #[no_mangle]
 pub unsafe extern "system" fn DllMain(
@@ -25,7 +24,7 @@ pub unsafe extern "system" fn DllMain(
                 unsafe {
                     let message = CString::new(err.to_string()).unwrap();
                     show_message_box(
-                        "QuickStart - Error patching game",
+                        "Quickstart - Error patching game",
                         &message.to_string_lossy(),
                     );
                 }

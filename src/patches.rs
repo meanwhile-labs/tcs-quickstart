@@ -1,9 +1,8 @@
 use serde::Deserialize;
 
 use crate::{
-    apply_patch::{apply_patch_entry, verify_patch_entry},
+    apply_patch::{apply_patch_entry, verify_patch_entry, PatchEntry},
     messaging::error_log,
-    patches_old::PatchEntry,
 };
 #[derive(Debug, PartialEq, Eq, Deserialize, Clone, Copy)]
 pub struct Config {

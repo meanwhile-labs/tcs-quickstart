@@ -1,4 +1,4 @@
-use std::{fs, io, path::Path};
+use std::{fs, io};
 
 use crate::{
     messaging::error_log,

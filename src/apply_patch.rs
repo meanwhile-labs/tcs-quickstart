@@ -4,9 +4,15 @@ use windows::Win32::System::Memory::{
 };
 
 use crate::messaging::error_log;
-use crate::patches_old::{Patch, PatchEntry};
 
 const PROCESS_START_OFFSET: u32 = 0x400000;
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct PatchEntry {
+    pub offset: u32,
+    pub original: Vec<u8>,
+    pub patch: Vec<u8>,
+}
 
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum VerifyPatchError {
@@ -58,46 +64,5 @@ pub unsafe fn apply_patch_entry(patch: &PatchEntry) -> Result<(), windows::core:
             err
         );
     });
-    Ok(())
-}
-
-#[derive(Debug, Error, PartialEq, Eq)]
-pub enum TryApplyPatchError {
-    #[error("Couldn't verify patches")]
-    Verify(Vec<(usize, VerifyPatchError)>),
-    #[error("Failed to apply patch #{0}: {1}")]
-    Apply(usize, windows::core::Error),
-}
-impl TryApplyPatchError {
-    pub fn get_error_text(&self, _patch: &Patch) -> String {
-        match self {
-            TryApplyPatchError::Verify(failed_verifications) => failed_verifications
-                .iter()
-                .map(|(patch_num, err)| format!("- Patch #{}: {:?}", patch_num, err))
-                .collect::<Vec<_>>()
-                .join("\n"),
-            TryApplyPatchError::Apply(_, _) => format!("{:?}", self),
-        }
-    }
-}
-
-pub unsafe fn try_apply_patch(patch: &Patch) -> Result<(), TryApplyPatchError> {
-    let mut verify_errors = vec![];
-    for (i, patch_entry) in patch.patches.iter().enumerate() {
-        let patch_num = i + 1;
-        if let Err(err) = verify_patch_entry(patch_entry) {
-            verify_errors.push((patch_num, err));
-            continue;
-        }
-    }
-
-    if !verify_errors.is_empty() {
-        return Err(TryApplyPatchError::Verify(verify_errors));
-    }
-
-    for (i, patch_entry) in patch.patches.iter().enumerate() {
-        let patch_num = i + 1;
-        apply_patch_entry(patch_entry).map_err(|err| TryApplyPatchError::Apply(patch_num, err))?;
-    }
     Ok(())
 }
