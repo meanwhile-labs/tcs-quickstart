@@ -8,6 +8,7 @@ mod apply_patch;
 mod init;
 mod messaging;
 mod patches;
+mod patches_old;
 
 #[no_mangle]
 pub unsafe extern "system" fn DllMain(

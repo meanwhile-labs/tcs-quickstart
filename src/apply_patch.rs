@@ -4,7 +4,7 @@ use windows::Win32::System::Memory::{
 };
 
 use crate::messaging::error_log;
-use crate::patches::{Patch, PatchEntry};
+use crate::patches_old::{Patch, PatchEntry};
 
 const PROCESS_START_OFFSET: u32 = 0x400000;
 
@@ -18,7 +18,7 @@ pub enum VerifyPatchError {
     MismatchedLengthsInConfig,
 }
 
-unsafe fn verify_patch_entry(patch: &PatchEntry) -> Result<(), VerifyPatchError> {
+pub unsafe fn verify_patch_entry(patch: &PatchEntry) -> Result<(), VerifyPatchError> {
     if patch.original.len() != patch.patch.len() {
         return Err(VerifyPatchError::MismatchedLengthsInConfig);
     }
@@ -40,7 +40,7 @@ unsafe fn verify_patch_entry(patch: &PatchEntry) -> Result<(), VerifyPatchError>
 
 /// It's extremely unsafe to call this without first calling `verify_patch_entry` to
 /// make sure the patch is valid.
-unsafe fn apply_patch_entry(patch: &PatchEntry) -> Result<(), windows::core::Error> {
+pub unsafe fn apply_patch_entry(patch: &PatchEntry) -> Result<(), windows::core::Error> {
     let address = (PROCESS_START_OFFSET + patch.offset) as *mut u8;
     let mut old_protect = PAGE_PROTECTION_FLAGS::default();
     VirtualProtect(
