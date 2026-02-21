@@ -1,0 +1,9 @@
+# Skips TT logo and legal screen, as well as
+# "A long time ago, in a galaxy far far away..."
+skip_splash_screens = true
+
+# Disables the music in the main menu, which is otherwise
+# always enabled on startup even if you've disabled music 
+# in settings.
+# Useful if you're listening to your own music while testing your mods!
+disable_main_menu_music = false
