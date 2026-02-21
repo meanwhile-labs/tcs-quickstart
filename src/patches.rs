@@ -1,5 +1,3 @@
-use std::num::ParseIntError;
-
 use serde::Deserialize;
 
 use crate::{
@@ -40,6 +38,25 @@ pub fn apply_patches(config: &Config) {
                 error_log!("Skip Splash Screens patch is invalid: {err}");
             } else if let Err(err) = apply_patch_entry(&skip_splash_screens) {
                 error_log!("Skip Splash Screens patch failed: {err}");
+            }
+        }
+    }
+
+    if config.disable_main_menu_music {
+        let disable_main_menu_music = PatchEntry {
+            offset: hex_number("28b42"),
+            // `mov byte ptr [esi + 0x6],0x1`
+            original: hex_bytes("c6 46 06 01"),
+            // `mov byte ptr [esi + 0x6],0x0`
+            patch: hex_bytes("c6 46 06 00"),
+        };
+
+        unsafe {
+            let verified = verify_patch_entry(&disable_main_menu_music);
+            if let Err(err) = verified {
+                error_log!("Disable Main Menu Music patch is invalid: {err}");
+            } else if let Err(err) = apply_patch_entry(&disable_main_menu_music) {
+                error_log!("Disable Main Menu Music patch failed: {err}");
             }
         }
     }
