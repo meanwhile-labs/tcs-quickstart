@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use crate::{
-    apply_patch::{apply_patch_entry, verify_patch_entry, PatchEntry},
+    apply_patch::{apply_patch, verify_patch, Patch},
     messaging::error_log,
 };
 #[derive(Debug, PartialEq, Eq, Deserialize, Clone, Copy)]
@@ -23,7 +23,7 @@ fn default_false() -> bool {
 
 pub fn apply_patches(config: &Config) {
     if config.skip_splash_screens {
-        let skip_splash_screens = PatchEntry {
+        let skip_splash_screens = Patch {
             offset: hex_number("ca6ce"),
             // `jp LEGOStarWarsSaga.exe+CAD10`
             original: hex_bytes("0f 8a 3c 06 00 00"),
@@ -32,17 +32,17 @@ pub fn apply_patches(config: &Config) {
         };
 
         unsafe {
-            let verified = verify_patch_entry(&skip_splash_screens);
+            let verified = verify_patch(&skip_splash_screens);
             if let Err(err) = verified {
                 error_log!("Skip Splash Screens patch is invalid: {err}");
-            } else if let Err(err) = apply_patch_entry(&skip_splash_screens) {
+            } else if let Err(err) = apply_patch(&skip_splash_screens) {
                 error_log!("Skip Splash Screens patch failed: {err}");
             }
         }
     }
 
     if config.disable_main_menu_music {
-        let disable_main_menu_music = PatchEntry {
+        let disable_main_menu_music = Patch {
             offset: hex_number("28b42"),
             // `mov byte ptr [esi + 0x6],0x1`
             original: hex_bytes("c6 46 06 01"),
@@ -51,10 +51,10 @@ pub fn apply_patches(config: &Config) {
         };
 
         unsafe {
-            let verified = verify_patch_entry(&disable_main_menu_music);
+            let verified = verify_patch(&disable_main_menu_music);
             if let Err(err) = verified {
                 error_log!("Disable Main Menu Music patch is invalid: {err}");
-            } else if let Err(err) = apply_patch_entry(&disable_main_menu_music) {
+            } else if let Err(err) = apply_patch(&disable_main_menu_music) {
                 error_log!("Disable Main Menu Music patch failed: {err}");
             }
         }

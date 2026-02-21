@@ -8,7 +8,7 @@ use crate::messaging::error_log;
 const PROCESS_START_OFFSET: u32 = 0x400000;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct PatchEntry {
+pub struct Patch {
     pub offset: u32,
     pub original: Vec<u8>,
     pub patch: Vec<u8>,
@@ -24,7 +24,7 @@ pub enum VerifyPatchError {
     MismatchedLengthsInConfig,
 }
 
-pub unsafe fn verify_patch_entry(patch: &PatchEntry) -> Result<(), VerifyPatchError> {
+pub unsafe fn verify_patch(patch: &Patch) -> Result<(), VerifyPatchError> {
     if patch.original.len() != patch.patch.len() {
         return Err(VerifyPatchError::MismatchedLengthsInConfig);
     }
@@ -44,9 +44,11 @@ pub unsafe fn verify_patch_entry(patch: &PatchEntry) -> Result<(), VerifyPatchEr
     }
 }
 
-/// It's extremely unsafe to call this without first calling `verify_patch_entry` to
+/// It's extremely unsafe to call this without first calling `verify_patch` to
 /// make sure the patch is valid.
-pub unsafe fn apply_patch_entry(patch: &PatchEntry) -> Result<(), windows::core::Error> {
+/// Also, this is not thread-safe; race conditions could cause unsafe behavior if
+/// two patches try to modify the same memory at once
+pub unsafe fn apply_patch(patch: &Patch) -> Result<(), windows::core::Error> {
     let address = (PROCESS_START_OFFSET + patch.offset) as *mut u8;
     let mut old_protect = PAGE_PROTECTION_FLAGS::default();
     VirtualProtect(
