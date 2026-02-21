@@ -1,21 +1,12 @@
-pub(crate) static mut HAS_CONSOLE: bool = false;
-
 macro_rules! error_log {
 	($($arg:tt)*) => {
-		unsafe {
-      use windows::Win32::Foundation::HANDLE;
-      use windows::Win32::System::Console::{AllocConsole, SetStdHandle, STD_OUTPUT_HANDLE};
-			if !crate::messaging::HAS_CONSOLE {
-				AllocConsole().unwrap();
-				SetStdHandle(STD_OUTPUT_HANDLE, HANDLE::default()).unwrap();
-				crate::messaging::HAS_CONSOLE = true;
-			}
-			eprintln!($($arg)*);
-		}
+        use crate::messaging::error_log_str;
+        error_log_str(&format!($($arg)*));
 	}
 }
 use std::ffi::CString;
 
+use chrono::Local;
 pub(crate) use error_log;
 use windows::{
     core::PCSTR,
@@ -34,4 +25,27 @@ pub unsafe fn show_message_box(title: &str, message: &str) {
         PCSTR::from_raw(title.as_ptr() as *const u8),
         MESSAGEBOX_STYLE(0x00000000),
     );
+}
+
+pub fn error_log_str(message: &str) {
+    use std::fs::OpenOptions;
+    use std::io::Write;
+    let timestamp = Local::now();
+    let file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("quickstart-log.txt");
+    let written =
+        file.and_then(|mut file| writeln!(file, "[{}] {}", timestamp.to_string(), message));
+
+    if let Err(_err) = written {
+        unsafe {
+            show_message_box(
+                "QuickStart mod error",
+                &("Unable to write to quickstart-log.txt; reporting error here instead.\n"
+                    .to_owned()
+                    + message),
+            );
+        }
+    }
 }

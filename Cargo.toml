@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 serde = { version = "1.0.208", features = ["derive"] }
 thiserror = "1.0.63"
 toml = "0.8.19"
+chrono = "0.4.43"
 
 [dependencies.windows]
 version = "0.58.0"

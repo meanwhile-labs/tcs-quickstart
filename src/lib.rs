@@ -1,12 +1,8 @@
 use std::ffi::CString;
 
-use windows::{
-    core::{s, PCSTR},
-    Win32::{
-        Foundation::{BOOL, FALSE, HINSTANCE, HWND, TRUE},
-        UI::WindowsAndMessaging::{MessageBoxA, MESSAGEBOX_STYLE},
-    },
-};
+use windows::Win32::Foundation::{BOOL, FALSE, HINSTANCE, TRUE};
+
+use crate::messaging::show_message_box;
 
 mod apply_patch;
 mod init;
@@ -27,11 +23,9 @@ pub unsafe extern "system" fn DllMain(
             Err(err) => {
                 unsafe {
                     let message = CString::new(err.to_string()).unwrap();
-                    MessageBoxA(
-                        HWND::default(),
-                        PCSTR::from_raw(message.as_ptr() as *const u8),
-                        s!("Error patching game"),
-                        MESSAGEBOX_STYLE(0x00000000),
+                    show_message_box(
+                        "QuickStart - Error patching game",
+                        &message.to_string_lossy(),
                     );
                 }
                 FALSE
