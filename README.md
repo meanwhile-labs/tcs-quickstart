@@ -12,6 +12,8 @@ It would probably work with the Steam version as well, but I haven't tested this
 
 ## Installation
 
+For easier installation instructions, check the [mod page on GameBanana](https://gamebanana.com/mods/658001)!
+
 1. Add [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) to the game folder (`dinput8.dll` will work fine).
 2. In the game folder, create a `plugins` folder.
 4. Download the latest [`quickstart.asi`](https://github.com/meanwhile-labs/tcs-quickstart/releases) file from this project and place it in `plugins`.
@@ -37,7 +39,7 @@ This is off by default, but it's a nice little bonus feature for modders who mig
 
 See `src/patches.rs` for the actual executable patches, and the `src/apply_patch.rs` file for the code that makes those changes happen. The rest is mostly housekeeping, plus some code to display log messages if needed.
 
-## Development
+## Building from Source
 
 DLL must be built with `cargo build --target i686-pc-windows-msvc` (i.e. 32-bit Windows) to actually work with the game! Then rename it to `quickstart.asi` to work with Ultimate ASI Loader.
 
